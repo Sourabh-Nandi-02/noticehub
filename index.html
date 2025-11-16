@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NoticeHub - Online Notice Management System</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Your theme CSS -->
+  <link rel="stylesheet" href="indexstyle.css">
+
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <i class="fas fa-bullhorn"></i>
+        <span>NoticeHub</span>
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#notices">Notices</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="auth-buttons">
+        <div class="search-box-navbar" style="margin-right:12px;">
+          <i class="fas fa-search"></i>
+          <input id="globalSearch" class="search-input-navbar" placeholder="Search notices..." />
+        </div>
+
+        <!-- area that will turn into "Hi, <name>" after login -->
+        <div id="profileArea" style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-outline" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+          <button class="btn btn-outline" id="signupBtn"><i class="fas fa-user-plus"></i> Sign Up</button>
+        </div>
+
+        <button class="btn btn-primary" id="createNoticeBtn"><i class="fas fa-plus"></i>Create Notice</button>
+
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="container">
+      <h1>Streamlined Notice Management for Educational Institutions</h1>
+      <p>Efficiently create, manage, and distribute notices with our intuitive online platform designed for schools and colleges.</p>
+      <button class="btn btn-primary" id="getStartedBtn"><i class="fas fa-rocket"></i> Get Started</button>
+    </div>
+  </section>
+
+  <!-- Features (unchanged) -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="fas fa-edit"></i>
+          <h3>Create & Edit Notices</h3>
+          <p>Easily create and edit notices with our user-friendly interface.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-tasks"></i>
+          <h3>Approval Workflow</h3>
+          <p>Structured approval for notices before publication.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-users"></i>
+          <h3>Dual User Roles</h3>
+          <p>Admin and user roles with different permissions.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-palette"></i>
+          <h3>Customizable Themes</h3>
+          <p>Switch between light and dark modes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notices section -->
+  <section class="notices" id="notices">
+    <div class="container">
+      <h2 class="section-title">Recent Notices</h2>
+
+      <div class="notice-filters">
+        <div class="filter-group">
+          <select class="filter-select" id="categoryFilter">
+            <option value="all">All Categories</option>
+            <option value="academic">Academic</option>
+            <option value="event">Events</option>
+            <option value="administrative">Administrative</option>
+            <option value="other">Other</option>
+          </select>
+
+          <select class="filter-select" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input id="searchInput" class="search-input" placeholder="Search notices..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="notices-grid" id="noticesGrid">
+        <!-- notices rendered here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Create/Edit Notice Modal -->
+  <div class="modal" id="noticeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Create New Notice</h2>
+        <button class="close-modal" id="closeModal">&times;</button>
+      </div>
+      <form id="noticeForm">
+        <input type="hidden" id="noticeId" />
+        <div class="form-group">
+          <label class="form-label" for="noticeTitle">Title</label>
+          <input type="text" class="form-control" id="noticeTitle" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="noticeCategory">Category</label>
+          <select class="form-control" id="noticeCategory" required>
+            <option value="">Select Category</option>
+            <option value="academic">Academic</option>
+            <option value="event">Events</option>
+            <option value="administrative">Administrative</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="noticeContent">Content</label>
+          <textarea class="form-control" id="noticeContent" required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="noticeExpiry">Expiry Date</label>
+          <input type="date" class="form-control" id="noticeExpiry" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Notice</button>
+          <button type="button" class="btn btn-outline" id="cancelNotice"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Login to NoticeHub</h2>
+        <button class="close-modal" id="closeLoginModal">&times;</button>
+      </div>
+
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="user">User Login</button>
+        <button class="login-tab" data-tab="admin">Admin Login</button>
+      </div>
+
+      <form class="login-form active" id="userLoginForm">
+        <div class="form-group">
+          <label class="form-label" for="userEmail">Email</label>
+          <input type="email" class="form-control" id="userEmail" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="userPassword">Password</label>
+          <input type="password" class="form-control" id="userPassword" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-sign-in-alt"></i> Login as User</button>
+      </form>
+
+      <form class="login-form" id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label" for="adminEmail">Admin Email</label>
+          <input type="email" class="form-control" id="adminEmail" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="adminPassword">Admin Password</label>
+          <input type="password" class="form-control" id="adminPassword" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-user-shield"></i> Login as Admin</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sign Up Modal -->
+  <div class="modal" id="signupModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Create an Account</h2>
+        <button class="close-modal" id="closeSignupModal">&times;</button>
+      </div>
+
+      <form id="signupForm">
+        <div class="form-group">
+          <label class="form-label" for="signupName">Name</label>
+          <input type="text" class="form-control" id="signupName" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupEmail">Email</label>
+          <input type="email" class="form-control" id="signupEmail" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupPassword">Password</label>
+          <input type="password" class="form-control" id="signupPassword" required />
+          <span id="pwdError" style="color:#e11d48; font-size:13px; display:none;"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupPasswordConfirm">Confirm Password</label>
+          <input type="password" class="form-control" id="signupPasswordConfirm" required />
+          <span id="pwdMatchError" style="color:#e11d48; font-size:13px; display:none;"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupRole">Role</label>
+          <select class="form-control" id="signupRole" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-user-plus"></i> Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <i class="fas fa-bullhorn"></i>
+        <span>NoticeHub</span>
+      </div>
+      <p class="footer-desc">Streamline notices — create, manage and distribute important information with ease.</p>
+
+      <div class="socials">
+        <a href="#" aria-label="facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="linkedin" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" aria-label="instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#notices">Notices</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#privacy">Privacy Policy</a></li>
+        <li><a href="#terms">Terms of Service</a></li>
+        <li><a href="#help">Help Center</a></li>
+        <li><a href="#about">About Us</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-newsletter">
+      <h4>Stay in the loop</h4>
+      <p>Subscribe to receive latest notices and updates.</p>
+
+      <form id="newsletterForm" class="newsletter-form" onsubmit="return false;">
+        <input id="newsletterEmail" type="email" placeholder="Your email address" aria-label="email" required />
+        <button id="newsletterBtn" class="btn btn-primary" type="button"><i class="fas fa-paper-plane"></i> Subscribe</button>
+      </form>
+
+      <small class="newsletter-note muted">We respect your privacy. Unsubscribe anytime.</small>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <span>&copy; 2025 NoticeHub. All rights reserved.</span>
+      <nav class="footer-bottom-nav">
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- main script -->
+  <script src="app.js"></script>
+</body>
+</html>
