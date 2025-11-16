@@ -126,6 +126,45 @@
     </div>
   </section>
 
+
+<!-- Admin Panel Section -->
+<section class="admin-panel" id="adminPanel" style="display: none;">
+  <div class="container">
+    <h2 class="section-title">Admin Panel - User Management</h2>
+    
+    <div class="admin-stats">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <span id="totalUsers">0</span>
+      </div>
+      <div class="stat-card">
+        <h3>Admins</h3>
+        <span id="adminCount">0</span>
+      </div>
+      <div class="stat-card">
+        <h3>Regular Users</h3>
+        <span id="userCount">0</span>
+      </div>
+    </div>
+
+    <div class="users-table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- Users will be populated here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
   <!-- Create/Edit Notice Modal -->
   <div class="modal" id="noticeModal">
     <div class="modal-content">
@@ -314,7 +353,7 @@
 </footer>
 
 <script>
-  window.__API_BASE__ = "https://noticehub-de0x.onrender.com";
+  window.__API_BASE__ = "https://noticehub-cv2j.onrender.com";
 </script>
   <!-- main script -->
   <script src="app.js"></script>

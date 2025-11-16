@@ -1,6 +1,6 @@
 // app.js - client-side logic for NoticeHub (localStorage-based, no backend required)
 // Drop this file next to index.html and indexstyle.css
-
+const API_BASE = '';
 (function () {
   // ---------- Constants & localStorage keys ----------
   const USERS_KEY = 'nh_users_v1';
@@ -209,6 +209,7 @@
     clearAuth();
     updateUIForAuth();
     renderNoticesFromState();
+    showAdminPanel(); // Hide admin panel on logout
   }
 
   // ---------- Profile & header update ----------
@@ -276,6 +277,9 @@
       // you might still want users to view notices but not create
       createNoticeBtn.style.display = 'none';
     }
+
+    // Show/hide admin panel based on role
+    showAdminPanel();
   }
 
   // initialize UI on load
@@ -492,12 +496,115 @@
   // 'Get Started' opens signup
   getStartedBtn && getStartedBtn.addEventListener('click', () => { signupForm.reset(); openModal(signupModal); });
 
+  // ---------- Admin Panel Functions ----------
+  function showAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    const auth = getAuth();
+    
+    if (auth && auth.role === 'admin') {
+      adminPanel.style.display = 'block';
+      renderUsersTable();
+    } else {
+      adminPanel.style.display = 'none';
+    }
+  }
+
+  function renderUsersTable() {
+    const users = loadUsers();
+    const tableBody = document.getElementById('usersTableBody');
+    const auth = getAuth(); // Current logged in user
+    
+    if (!tableBody) return;
+
+    // Update stats
+    document.getElementById('totalUsers').textContent = users.length;
+    document.getElementById('adminCount').textContent = users.filter(u => u.role === 'admin').length;
+    document.getElementById('userCount').textContent = users.filter(u => u.role === 'user').length;
+
+    tableBody.innerHTML = '';
+
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      
+      // Prevent modifying current user
+      const isCurrentUser = auth && auth.email === user.email;
+      
+      row.innerHTML = `
+        <td>${escapeHtml(user.name)}</td>
+        <td>${escapeHtml(user.email)}</td>
+        <td>
+          <span class="role-badge role-${user.role}">${user.role}</span>
+        </td>
+        <td>
+          <div class="user-actions">
+            <button class="btn-promote" ${user.role === 'admin' || isCurrentUser ? 'disabled' : ''} 
+                    onclick="promoteUser('${user.id}')">
+              <i class="fas fa-arrow-up"></i> Promote
+            </button>
+            <button class="btn-demote" ${user.role === 'user' || isCurrentUser ? 'disabled' : ''} 
+                    onclick="demoteUser('${user.id}')">
+              <i class="fas fa-arrow-down"></i> Demote
+            </button>
+            <button class="btn-delete-user" ${isCurrentUser ? 'disabled' : ''} 
+                    onclick="deleteUser('${user.id}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+  }
+
+  function promoteUser(userId) {
+    if (!confirm('Promote this user to admin?')) return;
+    
+    const users = loadUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex !== -1) {
+      users[userIndex].role = 'admin';
+      saveUsers(users);
+      renderUsersTable();
+      alert('User promoted to admin successfully');
+    }
+  }
+
+  function demoteUser(userId) {
+    if (!confirm('Demote this admin to regular user?')) return;
+    
+    const users = loadUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex !== -1) {
+      users[userIndex].role = 'user';
+      saveUsers(users);
+      renderUsersTable();
+      alert('Admin demoted to user successfully');
+    }
+  }
+
+  function deleteUser(userId) {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    
+    const users = loadUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex !== -1) {
+      const userEmail = users[userIndex].email;
+      users.splice(userIndex, 1);
+      saveUsers(users);
+      renderUsersTable();
+      alert(`User ${userEmail} deleted successfully`);
+    }
+  }
+
   // ---------- initialize rendering and UI ----------
   updateUIForAuth();
   renderNoticesFromState();
 
 })();
-
 
 // ---------- newsletter subscribe small handler ----------
 (function(){
@@ -522,3 +629,8 @@
     alert('Thanks — you have been subscribed to NoticeHub updates!');
   });
 })();
+
+// Make admin functions globally accessible
+window.promoteUser = promoteUser;
+window.demoteUser = demoteUser;
+window.deleteUser = deleteUser;
